@@ -178,6 +178,136 @@ loyalty-backend/
 └── index.js                 # Main Express server file
 ```
 
+### API Reference
+
+Here is a summary of the available API endpoints:
+
+#### Authentication
+
+*   **`POST /api/auth/register`**
+
+    Creates a new user.
+
+    **Request Body:**
+
+    ```json
+    {
+      "email": "test@example.com",
+      "password": "password123"
+    }
+    ```
+
+    **Example `curl` command:**
+
+    ```bash
+    curl -X POST http://localhost:3000/api/auth/register -H "Content-Type: application/json" -d '{"email": "test@example.com", "password": "password123"}'
+    ```
+
+*   **`POST /api/auth/login`**
+
+    Logs in a user and returns an ID token.
+
+    **Request Body:**
+
+    ```json
+    {
+      "email": "test@example.com",
+      "password": "password123"
+    }
+    ```
+
+    **Example `curl` command:**
+
+    ```bash
+    # Make sure to set the FIREBASE_WEB_API_KEY environment variable first
+    curl -X POST http://localhost:3000/api/auth/login -H "Content-Type: application/json" -d '{"email": "test@example.com", "password": "password123"}'
+    ```
+
+*   **`POST /api/auth/social-login`**
+
+    Handles user login via social providers (Google, Apple). It receives an ID token from the client, verifies it, and creates a new user in Firestore if one doesn't already exist.
+
+    **Request Body:**
+
+    ```json
+    {
+      "idToken": "{idToken}"
+    }
+    ```
+
+    **Example `curl` command:**
+
+    ```bash
+    # Replace {idToken} with the actual ID token from Google or Apple
+    curl -X POST http://localhost:3000/api/auth/social-login -H "Content-Type: application/json" -d '{"idToken": "{idToken}"}'
+    ```
+
+#### Rewards
+
+*   **`GET /api/rewards`**
+
+    Retrieves a list of all available rewards.
+
+    **Example `curl` command:**
+
+    ```bash
+    curl http://localhost:3000/api/rewards
+    ```
+
+#### Transactions
+
+*   **`POST /api/transactions/earn`**
+
+    Awards a specified number of points to a user.
+
+    **Request Body:**
+
+    ```json
+    {
+      "userId": "{userId}",
+      "points": 100
+    }
+    ```
+
+    **Example `curl` command:**
+
+    ```bash
+    # Replace {userId} with an actual user ID
+    curl -X POST http://localhost:3000/api/transactions/earn -H "Content-Type: application/json" -d '{"userId": "{userId}", "points": 100}'
+    ```
+
+*   **`POST /api/transactions/redeem`**
+
+    Redeems a reward for a user.
+
+    **Request Body:**
+
+    ```json
+    {
+      "userId": "{userId}",
+      "rewardId": "{rewardId}"
+    }
+    ```
+
+    **Example `curl` command:**
+
+    ```bash
+    # Replace {userId} and {rewardId} with actual IDs
+    curl -X POST http://localhost:3000/api/transactions/redeem -H "Content-Type: application/json" -d '{"userId": "{userId}", "rewardId": "{rewardId}"}'
+    ```
+
+#### Analytics
+
+*   **`GET /api/analytics/summary`**
+
+    Retrieves a summary of analytics data.
+
+    **Example `curl` command:**
+
+    ```bash
+    curl http://localhost:3000/api/analytics/summary
+    ```
+
 **Key Principles:**
 
 *   **Single Unified Backend:** All your frontend applications will interact with this one backend API.

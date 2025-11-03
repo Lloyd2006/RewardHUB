@@ -1,1 +1,4 @@
 rewardhub-26aae-firebase-adminsdk-fbsvc-6defcdb704.json
+.DS_Store
+node_modules
+serviceAccountKey.json

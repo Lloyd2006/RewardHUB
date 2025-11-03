@@ -84,6 +84,90 @@ The backend is built with a **Node.js** server using the **Express.js** framewor
 
 The backend project has been initialized in `packages/backend`. Necessary packages (`express`, `firebase-admin`, `cors`, `dotenv`, `nodemon`) have been installed. The Firebase Admin SDK has been initialized in `packages/backend/src/index.js` using `serviceAccountKey.json`.
 
+### API Documentation
+
+Here is a summary of the available API endpoints:
+
+#### Authentication
+
+*   **`POST /api/auth/register`**
+
+    Creates a new user.
+
+    **Request Body:**
+
+    ```json
+    {
+      "email": "test@example.com",
+      "password": "password123"
+    }
+    ```
+
+*   **`POST /api/auth/login`**
+
+    Logs in a user and returns an ID token.
+
+    **Request Body:**
+
+    ```json
+    {
+      "email": "test@example.com",
+      "password": "password123"
+    }
+    ```
+
+*   **`POST /api/auth/social-login`**
+
+    Handles user login via social providers (Google, Apple).
+
+    **Request Body:**
+
+    ```json
+    {
+      "idToken": "{idToken}"
+    }
+    ```
+
+#### Rewards
+
+*   **`GET /api/rewards`**
+
+    Retrieves a list of all available rewards.
+
+#### Transactions
+
+*   **`POST /api/transactions/earn`**
+
+    Awards a specified number of points to a user.
+
+    **Request Body:**
+
+    ```json
+    {
+      "userId": "{userId}",
+      "points": 100
+    }
+    ```
+
+*   **`POST /api/transactions/redeem`**
+
+    Redeems a reward for a user.
+
+    **Request Body:**
+
+    ```json
+    {
+      "userId": "{userId}",
+      "rewardId": "{rewardId}"
+    }
+    ```
+
+#### Analytics
+
+*   **`GET /api/analytics/summary`**
+
+    Retrieves a summary of analytics data.
+
 ---
 
 ## Customer App (React Native)
