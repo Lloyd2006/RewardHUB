@@ -18,6 +18,7 @@ exports.register = async (req, res) => {
       email: email,
       points: 0,
       qr_code: userRecord.uid, // Using uid as the QR code content
+      role: 'customer', // Assign default role
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
     });
 
@@ -82,6 +83,7 @@ exports.socialLogin = async (req, res) => {
         email: email,
         points: 0,
         qr_code: uid,
+        role: 'customer', // Assign default role
         createdAt: admin.firestore.FieldValue.serverTimestamp(),
       });
     }

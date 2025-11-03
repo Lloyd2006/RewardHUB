@@ -254,6 +254,38 @@ Here is a summary of the available API endpoints:
     curl http://localhost:3000/api/rewards
     ```
 
+*   **`POST /api/rewards` (Admin only)**
+
+    Creates a new reward. Requires admin privileges.
+
+    **Request Body:**
+
+    ```json
+    {
+      "name": "Free Coffee",
+      "description": "A free coffee of your choice",
+      "points_cost": 100,
+      "is_active": true
+    }
+    ```
+
+*   **`PUT /api/rewards/:rewardId` (Admin only)**
+
+    Updates an existing reward. Requires admin privileges.
+
+    **Request Body:**
+
+    ```json
+    {
+      "name": "Free Large Coffee",
+      "points_cost": 120
+    }
+    ```
+
+*   **`DELETE /api/rewards/:rewardId` (Admin only)**
+
+    Deletes a reward. Requires admin privileges.
+
 #### Transactions
 
 *   **`POST /api/transactions/earn`**

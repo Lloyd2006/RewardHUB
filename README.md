@@ -134,6 +134,18 @@ Here is a summary of the available API endpoints:
 
     Retrieves a list of all available rewards.
 
+*   **`POST /api/rewards` (Admin only)**
+
+    Creates a new reward.
+
+*   **`PUT /api/rewards/:rewardId` (Admin only)**
+
+    Updates an existing reward.
+
+*   **`DELETE /api/rewards/:rewardId` (Admin only)**
+
+    Deletes a reward.
+
 #### Transactions
 
 *   **`POST /api/transactions/earn`**
