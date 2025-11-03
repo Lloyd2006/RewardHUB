@@ -504,7 +504,49 @@ This dashboard is for monitoring the loyalty program. We can build a single web 
 
 ## 6. Deployment
 
-*   **Backend:**
+### Google Cloud Run Deployment for Backend
+
+This section details the steps to deploy the Node.js/Express backend to Google Cloud Run.
+
+1.  **Prerequisites:**
+    *   A Google Cloud Project with billing enabled.
+    *   The `gcloud` CLI installed and authenticated.
+    *   Your Google Cloud account must have the "Cloud Build Editor" and "Cloud Run Admin" roles (or equivalent permissions) for the project.
+
+2.  **Enable Google Cloud APIs:**
+    ```bash
+    gcloud services enable cloudbuild.googleapis.com run.googleapis.com
+    ```
+
+3.  **Build and Push Docker Image to Container Registry:**
+    Navigate to the root of your monorepo and run the following command. This will build the Docker image for the `backend` service and push it to Google Container Registry.
+    ```bash
+    gcloud builds submit --tag gcr.io/rewardhub-26aae/backend packages/backend
+    ```
+    *Replace `rewardhub-26aae` with your actual Google Cloud Project ID.*
+
+4.  **Deploy to Cloud Run:**
+    Deploy the built image to Cloud Run. This command creates a new Cloud Run service or updates an existing one.
+    ```bash
+    gcloud run deploy backend --image gcr.io/rewardhub-26aae/backend --platform managed --region us-central1 --allow-unauthenticated
+    ```
+    *   `backend`: The desired name for your Cloud Run service.
+    *   `--image`: The Docker image you just pushed.
+    *   `--platform managed`: Specifies that you want to deploy to the fully managed Cloud Run environment.
+    *   `--region us-central1`: Choose a Google Cloud region close to your users.
+    *   `--allow-unauthenticated`: Allows public access to your service. For production, you might want to restrict this and use IAM for authentication.
+
+5.  **Set Environment Variables (e.g., `FIREBASE_WEB_API_KEY`):**
+    If your backend requires environment variables (like the `FIREBASE_WEB_API_KEY` for client-side Firebase authentication), you can set them using:
+    ```bash
+    gcloud run services update backend --region us-central1 --set-env-vars FIREBASE_WEB_API_KEY="AIzaSyDlAWfMj2PAYn8EtqP3uRzupEtImuqHeOA"
+    ```
+    *Replace `YOUR_FIREBASE_WEB_API_KEY` with the actual key from your Firebase project settings.*
+
+6.  **Service URL:**
+    After successful deployment, the Cloud Run service will provide a URL (e.g., `https://backend-YOUR_PROJECT_ID.REGION.run.app`). This is the base URL for your backend API that your frontend applications will use.
+
+*   **Backend:
     *   **Google Cloud Run (Recommended):** Ideal for your Node.js/Express app. Package your application in a Docker container and deploy it. It offers serverless scalability while letting you keep your existing Express server structure.
     *   **Google Cloud Functions:** If you prefer a more granular, function-per-endpoint approach, you can deploy your API logic as individual Cloud Functions, which integrate tightly with Firebase.
     *   **Vercel or Heroku:** Excellent choices for ease of deployment. You can deploy your Node.js application directly from your Git repository. While not as tightly integrated with Google Cloud as the above, they offer a great developer experience.
