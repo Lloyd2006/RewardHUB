@@ -180,16 +180,17 @@ loyalty-backend/
 
 ### API Reference
 
-Here is a summary of the available API endpoints:
+This section provides a detailed explanation of each API endpoint.
+
+---
 
 #### Authentication
 
 *   **`POST /api/auth/register`**
 
-    Creates a new user.
+    **Description:** Registers a new user in the system. It creates a new user in Firebase Authentication and a corresponding user document in the Firestore `users` collection with a default role of `customer` and 0 points.
 
     **Request Body:**
-
     ```json
     {
       "email": "test@example.com",
@@ -197,18 +198,19 @@ Here is a summary of the available API endpoints:
     }
     ```
 
-    **Example `curl` command:**
-
-    ```bash
-    curl -X POST http://localhost:3000/api/auth/register -H "Content-Type: application/json" -d '{"email": "test@example.com", "password": "password123"}'
+    **Response:**
+    ```json
+    {
+      "message": "User registered successfully",
+      "userId": "some-unique-firebase-uid"
+    }
     ```
 
 *   **`POST /api/auth/login`**
 
-    Logs in a user and returns an ID token.
+    **Description:** Authenticates a user with their email and password. It returns an ID token that can be used to authenticate subsequent requests.
 
     **Request Body:**
-
     ```json
     {
       "email": "test@example.com",
@@ -216,50 +218,82 @@ Here is a summary of the available API endpoints:
     }
     ```
 
-    **Example `curl` command:**
-
-    ```bash
-    # Make sure to set the FIREBASE_WEB_API_KEY environment variable first
-    curl -X POST http://localhost:3000/api/auth/login -H "Content-Type: application/json" -d '{"email": "test@example.com", "password": "password123"}'
+    **Response:**
+    ```json
+    {
+      "message": "User logged in successfully",
+      "idToken": "...",
+      "refreshToken": "...",
+      "expiresIn": "3600",
+      "localId": "..."
+    }
     ```
 
 *   **`POST /api/auth/social-login`**
 
-    Handles user login via social providers (Google, Apple). It receives an ID token from the client, verifies it, and creates a new user in Firestore if one doesn't already exist.
+    **Description:** Authenticates a user via a social provider (Google or Apple). It expects an ID token from the client-side authentication flow. If the user doesn't exist, it creates a new user in Firebase and Firestore.
 
     **Request Body:**
-
     ```json
     {
       "idToken": "{idToken}"
     }
     ```
 
-    **Example `curl` command:**
-
-    ```bash
-    # Replace {idToken} with the actual ID token from Google or Apple
-    curl -X POST http://localhost:3000/api/auth/social-login -H "Content-Type: application/json" -d '{"idToken": "{idToken}"}'
+    **Response:**
+    ```json
+    {
+      "message": "User logged in successfully with social provider",
+      "idToken": "{idToken}",
+      "userId": "some-unique-firebase-uid"
+    }
     ```
+
+---
+
+#### Users
+
+*   **`GET /api/users/me`**
+
+    **Description:** Retrieves the profile of the currently authenticated user. Requires a valid ID token in the `Authorization` header.
+
+    **Response:**
+    ```json
+    {
+      "email": "test@example.com",
+      "points": 100,
+      "qr_code": "some-unique-firebase-uid",
+      "role": "customer",
+      "createdAt": "..."
+    }
+    ```
+
+---
 
 #### Rewards
 
 *   **`GET /api/rewards`**
 
-    Retrieves a list of all available rewards.
+    **Description:** Retrieves a list of all available rewards. Requires authentication.
 
-    **Example `curl` command:**
-
-    ```bash
-    curl http://localhost:3000/api/rewards
+    **Response:** An array of reward objects.
+    ```json
+    [
+      {
+        "id": "some-reward-id",
+        "name": "Free Coffee",
+        "description": "A free coffee of your choice",
+        "points_cost": 100,
+        "is_active": true
+      }
+    ]
     ```
 
 *   **`POST /api/rewards` (Admin only)**
 
-    Creates a new reward. Requires admin privileges.
+    **Description:** Creates a new reward. Requires admin privileges.
 
     **Request Body:**
-
     ```json
     {
       "name": "Free Coffee",
@@ -269,12 +303,19 @@ Here is a summary of the available API endpoints:
     }
     ```
 
+    **Response:**
+    ```json
+    {
+      "message": "Reward created successfully",
+      "rewardId": "some-new-reward-id"
+    }
+    ```
+
 *   **`PUT /api/rewards/:rewardId` (Admin only)**
 
-    Updates an existing reward. Requires admin privileges.
+    **Description:** Updates an existing reward. Requires admin privileges.
 
     **Request Body:**
-
     ```json
     {
       "name": "Free Large Coffee",
@@ -282,18 +323,33 @@ Here is a summary of the available API endpoints:
     }
     ```
 
+    **Response:**
+    ```json
+    {
+      "message": "Reward updated successfully"
+    }
+    ```
+
 *   **`DELETE /api/rewards/:rewardId` (Admin only)**
 
-    Deletes a reward. Requires admin privileges.
+    **Description:** Deletes a reward. Requires admin privileges.
+
+    **Response:**
+    ```json
+    {
+      "message": "Reward deleted successfully"
+    }
+    ```
+
+---
 
 #### Transactions
 
 *   **`POST /api/transactions/earn`**
 
-    Awards a specified number of points to a user.
+    **Description:** Awards a specified number of points to a user. This is typically used by the cashier app.
 
     **Request Body:**
-
     ```json
     {
       "userId": "{userId}",
@@ -301,19 +357,19 @@ Here is a summary of the available API endpoints:
     }
     ```
 
-    **Example `curl` command:**
-
-    ```bash
-    # Replace {userId} with an actual user ID
-    curl -X POST http://localhost:3000/api/transactions/earn -H "Content-Type: application/json" -d '{"userId": "{userId}", "points": 100}'
+    **Response:**
+    ```json
+    {
+      "message": "Points awarded successfully",
+      "transactionId": "some-unique-transaction-id"
+    }
     ```
 
 *   **`POST /api/transactions/redeem`**
 
-    Redeems a reward for a user.
+    **Description:** Redeems a reward for a user. It subtracts the reward's `points_cost` from the user's `points` balance.
 
     **Request Body:**
-
     ```json
     {
       "userId": "{userId}",
@@ -321,23 +377,29 @@ Here is a summary of the available API endpoints:
     }
     ```
 
-    **Example `curl` command:**
-
-    ```bash
-    # Replace {userId} and {rewardId} with actual IDs
-    curl -X POST http://localhost:3000/api/transactions/redeem -H "Content-Type: application/json" -d '{"userId": "{userId}", "rewardId": "{rewardId}"}'
+    **Response:**
+    ```json
+    {
+      "message": "Reward redeemed successfully",
+      "transactionId": "some-unique-transaction-id"
+    }
     ```
+
+---
 
 #### Analytics
 
 *   **`GET /api/analytics/summary`**
 
-    Retrieves a summary of analytics data.
+    **Description:** Retrieves a summary of analytics data, including total number of users, total points in circulation, and total number of transactions.
 
-    **Example `curl` command:**
-
-    ```bash
-    curl http://localhost:3000/api/analytics/summary
+    **Response:**
+    ```json
+    {
+      "totalUsers": 10,
+      "totalPointsInCirculation": 5000,
+      "totalTransactions": 50
+    }
     ```
 
 **Key Principles:**
